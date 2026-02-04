@@ -1,0 +1,5 @@
+/.venv
+/build
+/examples
+/main.py
+/src

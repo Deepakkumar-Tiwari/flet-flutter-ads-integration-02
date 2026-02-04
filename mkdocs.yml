@@ -1,0 +1,7 @@
+site_name: FletAdsExt
+
+theme:
+  name: "material"
+
+plugins:
+  - mkdocstrings
