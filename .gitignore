@@ -1,5 +1,3 @@
 /.venv
 /build
-/examples
-/main.py
-/src
+/examples/build
