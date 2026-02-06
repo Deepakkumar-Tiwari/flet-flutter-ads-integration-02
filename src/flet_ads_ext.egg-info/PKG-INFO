@@ -21,7 +21,7 @@ Add dependency to `pyproject.toml` of your Flet app:
 * **Git dependency**
 
 Link to git repository:
-
+d
 ```
 dependencies = [
   "flet-ads-ext @ git+https://github.com/MyGithubAccount/flet-ads-ext",

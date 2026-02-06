@@ -4,6 +4,11 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 import '../utils/ads.dart';
 
+// 1. Flet Integration (StatefulWidget & FletStoreMixin)
+// The class BannerAdControl extends StatefulWidget. This is necessary because ads have a "lifecycle"—they load, they fail, 
+//     or they get clicked—and the UI needs to update when those things happen.
+//     widget.control: This holds the data passed from your Flet code (like the unit_id).
+//     widget.control.triggerEvent: This is how the Flutter side tells the Python/Flet side that something happened (e.g., on_click).
 class BannerAdControl extends StatefulWidget {
   final Control control;
 
@@ -19,14 +24,16 @@ class _BannerAdControlState extends State<BannerAdControl> with FletStoreMixin {
   @override
   Widget build(BuildContext context) {
     debugPrint(
-        "BannerAd build: ${widget.control.id} (${widget.control.hashCode})");
+        "BannerAd build (*********): ${widget.control.id} (${widget.control.hashCode})");
+    widget.control.triggerEvent("log", "BannerAd build: ${widget.control.id}");
+
     final testAdUnitId = isIOSMobile()
         ? 'ca-app-pub-3940256099942544/4411468910'
         : 'ca-app-pub-3940256099942544/1033173712';
     BannerAd bannerAd = BannerAd(
       adUnitId: widget.control.getString("unit_id", testAdUnitId)!,
       request:
-          parseAdRequest(widget.control.get("request"), const AdRequest())!,
+          parseAdRequest(widget.control.get("request"), const AdRequest())!, // Using the parseAdRequest Helper
       size: AdSize.banner,
       listener: BannerAdListener(
         // Called when an ad is successfully received.

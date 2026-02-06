@@ -1,5 +1,11 @@
 import flet as ft
 from flet_ads_ext import RewardedAd, RewardEvent, BannerAd, InterstitialAd
+from pathlib import Path
+import asyncio
+from datetime import datetime
+from typing import List, Callable
+import time
+import traceback
 
 
 class AppLoggerv1:
@@ -86,7 +92,7 @@ def main(page: ft.Page):
     )
 
     log_container = ft.Container(
-        alignment=ft.alignment.top_right,
+        alignment=ft.Alignment.TOP_RIGHT,
         content=log_view,
         height=300,  # Fixed height for the log area
         width=200,
@@ -147,19 +153,67 @@ def main(page: ft.Page):
         on_user_earned_reward=handle_reward,
         on_error=lambda e: print(f"Ad Error: {e.data}"),
     )
+    loggerv1.logm(f"rewarded ad type: {type(rewarded_ad)}")
+    loggerv1.logm(f"rewarded ad unit_id: {rewarded_ad.unit_id}")
 
     # Add to page (invisible)
-    page.overlay.append(rewarded_ad)
+    def append_overlay(control):
+        page.overlay.append(control)
+        loggerv1.logm(f"rewarded ad initilized.")
 
+    Header_txt = ft.Text("Flet Ads Extension.", size=30, data=0)
     score_text = ft.Text("Score: 0", size=30, data=0)
+    load_rewardedad_btn = ft.ElevatedButton(
+        "Load RewardAd",
+        on_click=lambda _: append_overlay(rewarded_ad),
+    )
     show_rewardedad_btn = ft.ElevatedButton(
-        "Loading Reward...", on_click=lambda _: rewarded_ad.show(), disabled=True
+        "Show Reward...", on_click=lambda _: rewarded_ad.show(), disabled=True
+    )
+    show_bannerad_btn = ft.ElevatedButton(
+        "Show Banner Ad",
+        on_click=lambda _: get_new_banner_ad,
     )
 
+    def handle_incoming_banner_ad_custom_logs(e):
+        # 'e.data' will contain the string sent from Dart's debugPrint
+        print(f"📡 Flutter Log: {e.data}")
+        loggerv1.logm(f"BannerAd Flutter Log: {e.data}")
+
+    def get_new_banner_ad() -> ft.Container:
+        return ft.Container(
+            width=320,
+            height=90,
+            bgcolor=ft.Colors.TRANSPARENT,
+            content=BannerAd(
+                unit_id=ids.get(page.platform, {}).get("banner"),
+                on_click=lambda e: loggerv1.logm("BannerAd clicked"),
+                on_load=lambda e: loggerv1.logm("BannerAd loaded"),
+                on_error=lambda e: loggerv1.logm(f"BannerAd error: {e.data}"),
+                on_open=lambda e: loggerv1.logm("BannerAd opened"),
+                on_close=lambda e: loggerv1.logm("BannerAd closed"),
+                on_impression=lambda e: loggerv1.logm("BannerAd impression"),
+                on_will_dismiss=lambda e: loggerv1.logm("BannerAd will dismiss"),
+                on_log=handle_incoming_banner_ad_custom_logs,
+            ),
+        )
+
     page.add(
-        ft.Column(
-            controls=[score_text, show_rewardedad_btn],
-            alignment=ft.MainAxisAlignment.CENTER,
+        ft.Container(
+            alignment=ft.Alignment.TOP_RIGHT,
+            border=ft.border.all(1, ft.Colors.GREY_400),
+            content=ft.Column(
+                controls=[
+                    score_text,
+                    load_rewardedad_btn,
+                    show_rewardedad_btn,
+                    log_container,
+                    show_bannerad_btn,
+                    get_new_banner_ad,
+                ],
+                alignment=ft.MainAxisAlignment.END,
+                horizontal_alignment=ft.CrossAxisAlignment.END,
+            ),
         )
     )
 

@@ -8,7 +8,7 @@ authors = [
     { name = "Flet developer", email = "you@example.com" }
 ]
 dependencies = [
-    "flet-ads-ext @ file:///home/dpkmanjaro/Desktop/data/git/flet-flutter-ads-integration-02/",
+    "flet-ads-ext @ git+https://github.com/Deepakkumar-Tiwari/flet-flutter-ads-integration-02.git",
     "flet>=0.80.3",
 ]
 

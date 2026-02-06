@@ -24,12 +24,6 @@ class InterstitialAdService extends FletService {
         request: parseAdRequest(control.get("request"), const AdRequest())!,
         adLoadCallback: InterstitialAdLoadCallback(
           onAdLoaded: (ad) {
-
-
-
-
-
-
            
             ad.fullScreenContentCallback = FullScreenContentCallback(
               onAdShowedFullScreenContent: (ad) => control.triggerEvent("open"),

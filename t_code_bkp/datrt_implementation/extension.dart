@@ -19,7 +19,7 @@ class Extension extends FletExtension {
     switch (control.type) {
       case "InterstitialAd":
         return InterstitialAdService(control: control);
-      case "RewardedAd":  // <--- ADD THIS
+      case "RewardedAd":
         return RewardedAdService(control: control);
       default:
         return null;
