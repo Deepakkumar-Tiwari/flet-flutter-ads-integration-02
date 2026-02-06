@@ -14,7 +14,7 @@ dependencies:
 
   # your dependencies here
   collection: ^1.16.0
-  google_mobile_ads: ^24.9.0
+  google_mobile_ads: ^18.3.0
 
 dev_dependencies:
   flutter_test:
