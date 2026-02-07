@@ -15,6 +15,19 @@ class InterstitialAdService extends FletService {
     debugPrint("InterstitialAd(${control.id}).init: ${control.properties}");
     control.addInvokeMethodListener(_invokeMethod);
 
+    final testAdUnitId = isIOSMobile()
+        ? 'ca-app-pub-3940256099942544/4411468910'
+        : 'ca-app-pub-3940256099942544/1033173712';
+
+    // Save it so Python can read it later
+    // Use updateProperties to sync the ID back to the Flet state
+    control.updateProperties(
+      {"effective_unit_id": testAdUnitId},
+      dart: true,    // Update the local Dart state
+      python: true,  // Send the update across the bridge to Python
+      notify: false, // Don't trigger a UI rebuild for this background change
+    );
+
     InterstitialAd.load(
         adUnitId: control.getString(
             "unit_id",
@@ -58,6 +71,8 @@ class InterstitialAdService extends FletService {
       case "show":
         _interstitialAd?.show();
         return null;
+      case "get_unitid":
+        return control.getString("unit_id");
       default:
         throw Exception("Unknown InterstitialAd method: $name");
     }

@@ -21,6 +21,22 @@ class BannerAdControl extends StatefulWidget {
 class _BannerAdControlState extends State<BannerAdControl> with FletStoreMixin {
   bool _isLoaded = false;
 
+  // NEW METHOD: Converts a string from Flet (e.g., "largeBanner") to a Google AdSize
+  AdSize _getAdSize(String? sizeName) {
+    switch (sizeName) {
+      case "largeBanner":
+        return AdSize.largeBanner;
+      case "mediumRectangle":
+        return AdSize.mediumRectangle;
+      case "fullBanner":
+        return AdSize.fullBanner;
+      case "leaderboard":
+        return AdSize.leaderboard;
+      default:
+        return AdSize.banner; // Default standard banner
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     debugPrint(
@@ -30,6 +46,15 @@ class _BannerAdControlState extends State<BannerAdControl> with FletStoreMixin {
     final testAdUnitId = isIOSMobile()
         ? 'ca-app-pub-3940256099942544/4411468910'
         : 'ca-app-pub-3940256099942544/1033173712';
+
+    // Use updateProperties to sync the ID back to the Flet state
+    widget.control.updateProperties(
+      {"effective_unit_id": testAdUnitId},
+      dart: true,    // Update the local Dart state
+      python: true,  // Send the update across the bridge to Python
+      notify: false, // Don't trigger a UI rebuild for this background change
+    );
+
     BannerAd bannerAd = BannerAd(
       adUnitId: widget.control.getString("unit_id", testAdUnitId)!,
       request:

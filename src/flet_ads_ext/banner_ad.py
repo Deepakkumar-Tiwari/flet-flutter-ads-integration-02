@@ -54,3 +54,15 @@ class BannerAd(BaseAd):
         super()._before_build_command()
         # This tells the Flet bridge to watch for the "log" event string
         self._add_event_handler("log", self.on_log)
+
+    @property
+    def ad_size(self) -> Optional[str]:
+        return self._get_attr("adSize")
+
+    @ad_size.setter
+    def ad_size(self, value: Optional[str]):
+        self._set_attr("adSize", value)
+
+    @property
+    def effective_unit_id(self) -> Optional[str]:
+        return self._get_attr("effective_unit_id")

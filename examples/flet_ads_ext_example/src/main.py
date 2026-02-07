@@ -146,20 +146,29 @@ def main(page: ft.Page):
         show_rewardedad_btn.text = "Watch Ad for 10 Coins"
         page.update()
 
-    # 3. Define the Control
+    # 3. Define the RewardedAd Control
     rewarded_ad = RewardedAd(
         unit_id="ca-app-pub-3940256099942544/5224354917",  # Android Test ID
         on_load=handle_rewardedad_load,
         on_user_earned_reward=handle_reward,
         on_error=lambda e: print(f"Ad Error: {e.data}"),
     )
-    loggerv1.logm(f"rewarded ad type: {type(rewarded_ad)}")
-    loggerv1.logm(f"rewarded ad unit_id: {rewarded_ad.unit_id}")
+    # loggerv1.logm(f"rewarded ad type: {type(rewarded_ad)}")
+    # loggerv1.logm(f"rewarded ad unit_id: {rewarded_ad.unit_id}")
+    # loggerv1.logm(f"rewarded ad name: {rewarded_ad._get_control_name}")
+    # loggerv1.logm(f"rewarded ad props: {rewarded_ad._get_control_props}")
+    try:
+        iad = InterstitialAd()
+        loggerv1.logm(f"InterstitialAd.effective_unit_id: {iad.effective_unit_id}")
+        loggerv1.logm(f"InterstitialAd get_unitid: {iad.get_unitid()}")
+    except Exception as ex:
+        loggerv1.logm("Logger Error:", ex)
 
     # Add to page (invisible)
     def append_overlay(control):
         page.overlay.append(control)
         loggerv1.logm(f"rewarded ad initilized.")
+        page.update()
 
     Header_txt = ft.Text("Flet Ads Extension.", size=30, data=0)
     score_text = ft.Text("Score: 0", size=30, data=0)
@@ -175,17 +184,21 @@ def main(page: ft.Page):
         on_click=lambda _: get_new_banner_ad,
     )
 
+    banner_ad_container = ft.Container(
+        width=320,
+        height=90,
+        bgcolor=ft.Colors.BLACK,
+    )
+
     def handle_incoming_banner_ad_custom_logs(e):
         # 'e.data' will contain the string sent from Dart's debugPrint
         print(f"📡 Flutter Log: {e.data}")
         loggerv1.logm(f"BannerAd Flutter Log: {e.data}")
 
     def get_new_banner_ad() -> ft.Container:
-        return ft.Container(
-            width=320,
-            height=90,
-            bgcolor=ft.Colors.TRANSPARENT,
-            content=BannerAd(
+        banner_ad_container.bgcolor = ft.Colors.TRANSPARENT
+        banner_ad_container.content = (
+            BannerAd(
                 unit_id=ids.get(page.platform, {}).get("banner"),
                 on_click=lambda e: loggerv1.logm("BannerAd clicked"),
                 on_load=lambda e: loggerv1.logm("BannerAd loaded"),
@@ -197,6 +210,7 @@ def main(page: ft.Page):
                 on_log=handle_incoming_banner_ad_custom_logs,
             ),
         )
+        page.update()
 
     page.add(
         ft.Container(
@@ -209,7 +223,7 @@ def main(page: ft.Page):
                     show_rewardedad_btn,
                     log_container,
                     show_bannerad_btn,
-                    get_new_banner_ad,
+                    banner_ad_container,
                 ],
                 alignment=ft.MainAxisAlignment.END,
                 horizontal_alignment=ft.CrossAxisAlignment.END,

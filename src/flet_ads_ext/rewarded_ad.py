@@ -24,3 +24,9 @@ class RewardedAd(BaseAd):
         The 'on_user_earned_reward' event will be triggered if the user completes the action.
         """
         await self._invoke_method("show")
+
+    def _get_control_name(self):
+        return "RewardedAd"  # Must match what you use in UI
+
+    def _get_control_props(self):
+        return self.__dict__

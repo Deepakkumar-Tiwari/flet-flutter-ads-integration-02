@@ -20,7 +20,8 @@ class Extension extends FletExtension {
       case "InterstitialAd":
         return InterstitialAdService(control: control);
       case "RewardedAd":
-        return RewardedAdService(control: control);
+        // return RewardedAdService(control: control);
+        return null;
       default:
         return null;
     }
