@@ -1,4 +1,6 @@
 import flet as ft
+import flet_ads_ext as fta
+
 from flet_ads_ext import RewardedAd, RewardEvent, BannerAd, InterstitialAd
 from pathlib import Path
 import asyncio
@@ -221,11 +223,11 @@ def main(page: ft.Page):
         bgcolor=ft.Colors.BLACK,
     )
 
-    def get_new_banner_ad():
+    def get_new_custom_banner_ad():
         loggerv1.logm("get_new_banner_ad method triggered.")
         try:
             bads = (
-                BannerAd(
+                fta.BannerAd(
                     unit_id="ca-app-pub-3940256099942544/9214589741",
                     on_click=lambda e: loggerv1.logm("BannerAd clicked"),
                     on_load=lambda e: loggerv1.logm("BannerAd loaded"),
@@ -238,44 +240,64 @@ def main(page: ft.Page):
             )
             banner_ad_container.content = bads
         except Exception as ex:
-            loggerv1.logm(f"get_new_banner_ad method Error {ex}.")
+            loggerv1.logm(f"get_new_custom_banner_ad method Error {ex}.")
 
         banner_ad_container.bgcolor = ft.Colors.TRANSPARENT
         page.update()
 
+    def get_new_banner_ad() -> ft.Container:
+        return ft.Container(
+            width=320,
+            height=50,
+            bgcolor=ft.Colors.TRANSPARENT,
+            content=fta.BannerAd(
+                unit_id="ca-app-pub-3940256099942544/6300978111",
+                on_click=lambda e: print("BannerAd clicked"),
+                on_load=lambda e: print("BannerAd loaded"),
+                on_error=lambda e: print("BannerAd error", e.data),
+                on_open=lambda e: print("BannerAd opened"),
+                on_close=lambda e: print("BannerAd closed"),
+                on_impression=lambda e: print("BannerAd impression"),
+                on_will_dismiss=lambda e: print("BannerAd will dismiss"),
+            ),
+        )
+
     show_bannerad_btn = ft.Button(
         "Show Banner Ad",
-        on_click=get_new_banner_ad,
+        on_click=get_new_custom_banner_ad,
     )
 
     page.add(
-        ft.Container(
-            alignment=ft.Alignment.TOP_RIGHT,
-            border=ft.Border.all(1, ft.Colors.GREY_400),
-            padding=5,
-            expand=True,
-            content=ft.Column(
-                expand=True,
-                controls=[
-                    ft.Column(
-                        alignment=ft.MainAxisAlignment.END,
-                        horizontal_alignment=ft.CrossAxisAlignment.END,
-                        expand=True,
-                        scroll=ft.ScrollMode.ALWAYS,
-                        controls=[
-                            score_text,
-                            load_rewardedad_btn,
-                            show_rewardedad_btn,
-                            load_interstitial_btn,
-                            show_interstitial_btn,
-                            log_container,
-                            show_bannerad_btn,
-                            banner_ad_container,
-                        ],
-                    )
-                ],
-            ),
-        )
+        # ft.Container(
+        #     alignment=ft.Alignment.TOP_RIGHT,
+        #     border=ft.Border.all(1, ft.Colors.RED_100),
+        #     padding=5,
+        #     expand=True,
+        #     content=ft.Column(
+        #         expand=True,
+        #         controls=[
+        #             ft.Column(
+        #                 alignment=ft.MainAxisAlignment.END,
+        #                 horizontal_alignment=ft.CrossAxisAlignment.END,
+        #                 expand=True,
+        #                 scroll=ft.ScrollMode.ALWAYS,
+        #                 controls=[
+        #                     # score_text,
+        #                     # load_rewardedad_btn,
+        #                     # show_rewardedad_btn,
+        #                     # load_interstitial_btn,
+        #                     # show_interstitial_btn,
+        #                     log_container,
+        #                     show_bannerad_btn,
+        #                 ],
+        #             )
+        #         ],
+        #     ),
+        # ),
+        ft.OutlinedButton(
+            content="Show BannerAd",
+            on_click=lambda e: page.add(get_new_banner_ad()),
+        ),
     )
 
 

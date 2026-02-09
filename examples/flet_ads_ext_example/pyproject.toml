@@ -10,6 +10,7 @@ authors = [
 dependencies = [
     "flet-ads-ext @ file://../../",
     "flet>=0.80.3",
+    "flet-ads>=0.80.3",
 ]
 #    "flet-ads-ext @ git+https://github.com/Deepakkumar-Tiwari/flet-flutter-ads-integration-02.git",
 #    "flet-ads-ext @ file://../../",
