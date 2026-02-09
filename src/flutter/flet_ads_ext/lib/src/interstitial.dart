@@ -3,6 +3,7 @@ import 'package:flutter/widgets.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 import '../utils/ads.dart';
+import '../utils/logger.dart';
 
 class InterstitialAdService extends FletService {
   InterstitialAdService({required super.control});
@@ -37,9 +38,13 @@ class InterstitialAdService extends FletService {
         request: parseAdRequest(control.get("request"), const AdRequest())!,
         adLoadCallback: InterstitialAdLoadCallback(
           onAdLoaded: (ad) {
+            LocalLogger.log("InterstitialAd onAdLoaded event. Creating fullscreen content.");
            
             ad.fullScreenContentCallback = FullScreenContentCallback(
-              onAdShowedFullScreenContent: (ad) => control.triggerEvent("open"),
+              onAdShowedFullScreenContent: (ad) {
+                control.triggerEvent("log", "InterstitialAd onAdShowedFullScreenContent event.");
+                control.triggerEvent("open");
+              },
               onAdImpression: (ad) => control.triggerEvent("impression"),
               onAdFailedToShowFullScreenContent: (ad, error) {
                 control.triggerEvent("error", error.toString());
@@ -69,6 +74,7 @@ class InterstitialAdService extends FletService {
     debugPrint("InterstitialAd.$name($args)");
     switch (name) {
       case "show":
+        control.triggerEvent("log", "InterstitialAd onAdShow method triggered in dart.");
         _interstitialAd?.show();
         return null;
       case "get_unitid":

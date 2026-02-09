@@ -1,11 +1,11 @@
 from typing import Optional
 
 import flet as ft
-from flet_ads_ext.base_ad import BaseAd
+from flet_ads_ext.base import BaseAd
 from flet_ads_ext.types import PaidAdEvent
 
 
-@ft.control("BannerAd")
+@ft.control("banner")
 class BannerAd(BaseAd):
     """
     Decorator: Registers this Python class with the Flet engine.

@@ -96,7 +96,7 @@ def main(page: ft.Page):
         content=log_view,
         height=300,  # Fixed height for the log area
         width=200,
-        border=ft.border.all(1, ft.Colors.GREY_400),
+        border=ft.Border.all(1, ft.Colors.GREY_400),
         border_radius=10,
         bgcolor=ft.Colors.GREY_50,
     )
@@ -144,23 +144,44 @@ def main(page: ft.Page):
     def handle_rewardedad_load(e):
         show_rewardedad_btn.disabled = False
         show_rewardedad_btn.text = "Watch Ad for 10 Coins"
+        loggerv1.logm("RewardedAd loaded event received from dart.")
         page.update()
 
-    # 3. Define the RewardedAd Control
-    rewarded_ad = RewardedAd(
-        unit_id="ca-app-pub-3940256099942544/5224354917",  # Android Test ID
-        on_load=handle_rewardedad_load,
-        on_user_earned_reward=handle_reward,
-        on_error=lambda e: print(f"Ad Error: {e.data}"),
-    )
-    # loggerv1.logm(f"rewarded ad type: {type(rewarded_ad)}")
-    # loggerv1.logm(f"rewarded ad unit_id: {rewarded_ad.unit_id}")
-    # loggerv1.logm(f"rewarded ad name: {rewarded_ad._get_control_name}")
-    # loggerv1.logm(f"rewarded ad props: {rewarded_ad._get_control_props}")
     try:
-        iad = InterstitialAd()
-        loggerv1.logm(f"InterstitialAd.effective_unit_id: {iad.effective_unit_id}")
-        loggerv1.logm(f"InterstitialAd get_unitid: {iad.get_unitid()}")
+        # 3. Define the RewardedAd Control
+        rewarded_ad = RewardedAd(
+            unit_id="ca-app-pub-3940256099942544/5224354917",  # Android Test ID
+            on_load=handle_rewardedad_load,
+            on_user_earned_reward=handle_reward,
+            on_error=lambda e: print(f"Ad Error: {e.data}"),
+        )
+        loggerv1.logm("TYPE OF rewarded_ad", type(rewarded_ad))
+
+        iad = InterstitialAd(
+            unit_id="ca-app-pub-3940256099942544/1033173712",  # Android Test ID
+            on_click=lambda e: loggerv1.logm(
+                "InterstitialAd clicked event received from dart."
+            ),
+            on_load=lambda e: loggerv1.logm(
+                "InterstitialAd loaded event received from dart."
+            ),
+            on_error=lambda e: loggerv1.logm(
+                f"InterstitialAd error event received from dart: {e.data}"
+            ),
+            on_open=lambda e: loggerv1.logm(
+                "InterstitialAd opened event received from dart."
+            ),
+            on_close=lambda e: loggerv1.logm(
+                "InterstitialAd closed event received from dart."
+            ),
+            on_impression=lambda e: loggerv1.logm(
+                "InterstitialAd impression event received from dart."
+            ),
+            on_log=lambda e: loggerv1.logm(
+                f"InterstitialAd log received from dart: {e.data}"
+            ),
+        )
+        loggerv1.logm("TYPE OF IAD", type(iad))
     except Exception as ex:
         loggerv1.logm("Logger Error:", ex)
 
@@ -170,18 +191,32 @@ def main(page: ft.Page):
         loggerv1.logm(f"rewarded ad initilized.")
         page.update()
 
+    def clear_overlay():
+        page.overlay.clear()
+        page.update()
+
     Header_txt = ft.Text("Flet Ads Extension.", size=30, data=0)
     score_text = ft.Text("Score: 0", size=30, data=0)
-    load_rewardedad_btn = ft.ElevatedButton(
+    load_rewardedad_btn = ft.Button(
         "Load RewardAd",
         on_click=lambda _: append_overlay(rewarded_ad),
     )
-    show_rewardedad_btn = ft.ElevatedButton(
-        "Show Reward...", on_click=lambda _: rewarded_ad.show(), disabled=True
+    show_rewardedad_btn = ft.Button(
+        "Show Reward...", on_click=lambda _: rewarded_ad.show()
     )
-    show_bannerad_btn = ft.ElevatedButton(
+    show_bannerad_btn = ft.Button(
         "Show Banner Ad",
         on_click=lambda _: get_new_banner_ad,
+    )
+    load_interstitial_btn = ft.Button(
+        "Load Interstitial Ad",
+        on_click=lambda _: append_overlay(iad),
+    )
+    show_interstitial_btn = ft.Button(
+        "Show Interstitial...", on_click=lambda _: iad.show()
+    )
+    clear_overlay_btn = ft.Button(
+        "Clear Overlay...", on_click=lambda _: clear_overlay()
     )
 
     banner_ad_container = ft.Container(
@@ -190,43 +225,52 @@ def main(page: ft.Page):
         bgcolor=ft.Colors.BLACK,
     )
 
-    def handle_incoming_banner_ad_custom_logs(e):
-        # 'e.data' will contain the string sent from Dart's debugPrint
-        print(f"📡 Flutter Log: {e.data}")
-        loggerv1.logm(f"BannerAd Flutter Log: {e.data}")
-
-    def get_new_banner_ad() -> ft.Container:
+    def get_new_banner_ad():
+        loggerv1.logm("get_new_banner_ad method triggered.")
         banner_ad_container.bgcolor = ft.Colors.TRANSPARENT
-        banner_ad_container.content = (
-            BannerAd(
-                unit_id=ids.get(page.platform, {}).get("banner"),
-                on_click=lambda e: loggerv1.logm("BannerAd clicked"),
-                on_load=lambda e: loggerv1.logm("BannerAd loaded"),
-                on_error=lambda e: loggerv1.logm(f"BannerAd error: {e.data}"),
-                on_open=lambda e: loggerv1.logm("BannerAd opened"),
-                on_close=lambda e: loggerv1.logm("BannerAd closed"),
-                on_impression=lambda e: loggerv1.logm("BannerAd impression"),
-                on_will_dismiss=lambda e: loggerv1.logm("BannerAd will dismiss"),
-                on_log=handle_incoming_banner_ad_custom_logs,
-            ),
-        )
+        try:
+            banner_ad_container.content = (
+                BannerAd(
+                    unit_id=ids.get(page.platform, {}).get("banner"),
+                    on_click=lambda e: loggerv1.logm("BannerAd clicked"),
+                    on_load=lambda e: loggerv1.logm("BannerAd loaded"),
+                    on_error=lambda e: loggerv1.logm(f"BannerAd error: {e.data}"),
+                    on_open=lambda e: loggerv1.logm("BannerAd opened"),
+                    on_close=lambda e: loggerv1.logm("BannerAd closed"),
+                    on_impression=lambda e: loggerv1.logm("BannerAd impression"),
+                    on_will_dismiss=lambda e: loggerv1.logm("BannerAd will dismiss"),
+                ),
+            )
+        except Exception as ex:
+            loggerv1.logm(f"get_new_banner_ad method Error {ex}.")
         page.update()
 
     page.add(
         ft.Container(
             alignment=ft.Alignment.TOP_RIGHT,
-            border=ft.border.all(1, ft.Colors.GREY_400),
+            border=ft.Border.all(1, ft.Colors.GREY_400),
+            padding=5,
+            expand=True,
             content=ft.Column(
+                expand=True,
                 controls=[
-                    score_text,
-                    load_rewardedad_btn,
-                    show_rewardedad_btn,
-                    log_container,
-                    show_bannerad_btn,
-                    banner_ad_container,
+                    ft.Column(
+                        alignment=ft.MainAxisAlignment.END,
+                        horizontal_alignment=ft.CrossAxisAlignment.END,
+                        expand=True,
+                        scroll=ft.ScrollMode.ALWAYS,
+                        controls=[
+                            score_text,
+                            load_rewardedad_btn,
+                            show_rewardedad_btn,
+                            load_interstitial_btn,
+                            show_interstitial_btn,
+                            log_container,
+                            show_bannerad_btn,
+                            banner_ad_container,
+                        ],
+                    )
                 ],
-                alignment=ft.MainAxisAlignment.END,
-                horizontal_alignment=ft.CrossAxisAlignment.END,
             ),
         )
     )

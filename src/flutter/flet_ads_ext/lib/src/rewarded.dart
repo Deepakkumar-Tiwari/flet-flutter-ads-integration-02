@@ -3,6 +3,7 @@ import 'package:flutter/widgets.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 import '../utils/ads.dart';
+import '../utils/logger.dart';
 
 class RewardedAdService extends FletService {
   RewardedAdService({required super.control});
@@ -29,6 +30,7 @@ class RewardedAdService extends FletService {
       rewardedAdLoadCallback: RewardedAdLoadCallback(
         onAdLoaded: (ad) {
           debugPrint('$ad loaded.');
+          LocalLogger.log("RewardedAd onAdLoaded event. Creating fullscreen content.");
 
           // Setup callbacks for when the ad is actually shown
           ad.fullScreenContentCallback = FullScreenContentCallback(
@@ -62,8 +64,10 @@ class RewardedAdService extends FletService {
     debugPrint("RewardedAd.$name($args)");
     switch (name) {
       case "show":
+        LocalLogger.log("RewardedAd show method triggered at dart side.");
         if (_rewardedAd == null) {
           debugPrint('Warning: Attempted to show rewarded ad before loading.');
+          LocalLogger.log('Warning: Attempted to show rewarded ad before loading.');
           return null;
         }
         _rewardedAd?.show(

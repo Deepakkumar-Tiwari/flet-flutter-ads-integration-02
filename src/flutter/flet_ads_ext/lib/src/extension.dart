@@ -6,6 +6,8 @@ import 'banner.dart';
 import 'interstitial.dart';
 import 'rewarded.dart';
 
+import '../utils/logger.dart';
+
 class Extension extends FletExtension {
   @override
   void ensureInitialized() {
@@ -18,10 +20,11 @@ class Extension extends FletExtension {
   FletService? createService(Control control) {
     switch (control.type) {
       case "InterstitialAd":
+        LocalLogger.log("InterstitialAd bridge successfull.");
         return InterstitialAdService(control: control);
       case "RewardedAd":
-        // return RewardedAdService(control: control);
-        return null;
+        LocalLogger.log("RewardedAd bridge successfull.");
+        return RewardedAdService(control: control);
       default:
         return null;
     }
@@ -31,6 +34,7 @@ class Extension extends FletExtension {
   Widget? createWidget(Key? key, Control control) {
     switch (control.type) {
       case "BannerAd":
+        LocalLogger.log("BannerAd bridge successfull.");
         return BannerAdControl(control: control);
       /* TODO: Finalize NativeAdControl -> https://developers.google.com/admob/flutter/native/platforms
       case "NativeAd":
