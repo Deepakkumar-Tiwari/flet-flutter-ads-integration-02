@@ -1,17 +1,18 @@
-import flet as ft
-from typing import Optional
-from flet_ads_ext.types import AdRequest
 from dataclasses import field
+from typing import Optional
+
+import flet as ft
+from flet_ads_ext.types import AdRequest
 
 
-@ft.control("InterstitialAd")
-class InterstitialAd(ft.Service):
+@ft.control
+class BaseAd(ft.Control):
     """
-    Displays a full-screen interstitial ad.
+    Base class for all ad controls in Flet Ads package.
 
     Raises:
-        FletUnsupportedPlatformException: When using this control on a
-            web and/or non-mobile platform.
+        FletUnsupportedPlatformException: When using this control on a web
+            and/or non-mobile platform.
     """
 
     unit_id: str
@@ -61,17 +62,6 @@ class InterstitialAd(ft.Service):
     """
     Called when this ad is clicked.
     """
-
-    on_log: Optional[ft.ControlEventHandler["BaseAd"]] = None
-    """
-    Called when this ad emits log.
-
-    Event handler argument [`data`][flet.Event.data] property
-    contains information about the log.
-    """
-
-    async def show(self):
-        await self._invoke_method("show")
 
     # def before_update(self):
     #     if self.page.web or not self.page.platform.is_mobile():

@@ -155,7 +155,7 @@ def main(page: ft.Page):
             on_user_earned_reward=handle_reward,
             on_error=lambda e: print(f"Ad Error: {e.data}"),
         )
-        loggerv1.logm("TYPE OF rewarded_ad", type(rewarded_ad))
+        # loggerv1.logm("TYPE OF rewarded_ad", type(rewarded_ad))
 
         iad = InterstitialAd(
             unit_id="ca-app-pub-3940256099942544/1033173712",  # Android Test ID
@@ -181,7 +181,7 @@ def main(page: ft.Page):
                 f"InterstitialAd log received from dart: {e.data}"
             ),
         )
-        loggerv1.logm("TYPE OF IAD", type(iad))
+        # loggerv1.logm("TYPE OF IAD", type(iad))
     except Exception as ex:
         loggerv1.logm("Logger Error:", ex)
 
@@ -204,10 +204,6 @@ def main(page: ft.Page):
     show_rewardedad_btn = ft.Button(
         "Show Reward...", on_click=lambda _: rewarded_ad.show()
     )
-    show_bannerad_btn = ft.Button(
-        "Show Banner Ad",
-        on_click=lambda _: get_new_banner_ad,
-    )
     load_interstitial_btn = ft.Button(
         "Load Interstitial Ad",
         on_click=lambda _: append_overlay(iad),
@@ -227,11 +223,10 @@ def main(page: ft.Page):
 
     def get_new_banner_ad():
         loggerv1.logm("get_new_banner_ad method triggered.")
-        banner_ad_container.bgcolor = ft.Colors.TRANSPARENT
         try:
-            banner_ad_container.content = (
+            bads = (
                 BannerAd(
-                    unit_id=ids.get(page.platform, {}).get("banner"),
+                    unit_id="ca-app-pub-3940256099942544/9214589741",
                     on_click=lambda e: loggerv1.logm("BannerAd clicked"),
                     on_load=lambda e: loggerv1.logm("BannerAd loaded"),
                     on_error=lambda e: loggerv1.logm(f"BannerAd error: {e.data}"),
@@ -241,9 +236,17 @@ def main(page: ft.Page):
                     on_will_dismiss=lambda e: loggerv1.logm("BannerAd will dismiss"),
                 ),
             )
+            banner_ad_container.content = bads
         except Exception as ex:
             loggerv1.logm(f"get_new_banner_ad method Error {ex}.")
+
+        banner_ad_container.bgcolor = ft.Colors.TRANSPARENT
         page.update()
+
+    show_bannerad_btn = ft.Button(
+        "Show Banner Ad",
+        on_click=get_new_banner_ad,
+    )
 
     page.add(
         ft.Container(

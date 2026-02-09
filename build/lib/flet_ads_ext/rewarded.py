@@ -1,17 +1,13 @@
-import flet as ft
 from typing import Optional
-from flet_ads_ext.types import AdRequest
+import flet as ft
+from flet_ads_ext.types import RewardEvent, AdRequest
 from dataclasses import field
 
 
-@ft.control("InterstitialAd")
-class InterstitialAd(ft.Service):
+@ft.control("RewardedAd")
+class RewardedAd(ft.Service):
     """
-    Displays a full-screen interstitial ad.
-
-    Raises:
-        FletUnsupportedPlatformException: When using this control on a
-            web and/or non-mobile platform.
+    Displays a full-screen rewarded ad.
     """
 
     unit_id: str
@@ -62,20 +58,25 @@ class InterstitialAd(ft.Service):
     Called when this ad is clicked.
     """
 
-    on_log: Optional[ft.ControlEventHandler["BaseAd"]] = None
+    on_user_earned_reward: Optional[
+        ft.ControlEventHandler[RewardEvent["RewardedAd"]]
+    ] = None
     """
-    Called when this ad emits log.
-
-    Event handler argument [`data`][flet.Event.data] property
-    contains information about the log.
+    Called when the user earns a reward.
+    Contains 'type' and 'amount' of the reward.
     """
 
     async def show(self):
+        """
+        Shows the rewarded ad.
+        The 'on_user_earned_reward' event will be triggered if the user completes the action.
+        """
         await self._invoke_method("show")
-
+    
     # def before_update(self):
     #     if self.page.web or not self.page.platform.is_mobile():
     #         raise ft.FletUnsupportedPlatformException(
     #             f"{self.__class__.__name__} is only supported on "
     #             f"Mobile (Android and iOS)"
     #         )
+

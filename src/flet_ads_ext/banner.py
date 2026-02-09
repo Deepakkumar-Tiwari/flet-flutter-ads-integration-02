@@ -5,7 +5,7 @@ from flet_ads_ext.base import BaseAd
 from flet_ads_ext.types import PaidAdEvent
 
 
-@ft.control("banner")
+@ft.control("BannerAd")
 class BannerAd(BaseAd):
     """
     Decorator: Registers this Python class with the Flet engine.
@@ -40,29 +40,3 @@ class BannerAd(BaseAd):
 
     Available for allowlisted accounts only.
     """
-
-    on_log: Optional[ft.ControlEventHandler[any]] = None
-    """
-    Called when a debug message is sent from the Flutter side.
-    """
-
-    # Register the event name in the control's internal event map
-    def _get_control_name(self):
-        return "BannerAd"
-
-    def _before_build_command(self):
-        super()._before_build_command()
-        # This tells the Flet bridge to watch for the "log" event string
-        self._add_event_handler("log", self.on_log)
-
-    @property
-    def ad_size(self) -> Optional[str]:
-        return self._get_attr("adSize")
-
-    @ad_size.setter
-    def ad_size(self, value: Optional[str]):
-        self._set_attr("adSize", value)
-
-    @property
-    def effective_unit_id(self) -> Optional[str]:
-        return self._get_attr("effective_unit_id")
