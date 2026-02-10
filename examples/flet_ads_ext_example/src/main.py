@@ -1,7 +1,6 @@
 import flet as ft
 import flet_ads_ext as fta
 
-from flet_ads_ext import RewardedAd, RewardEvent, BannerAd, InterstitialAd
 from pathlib import Path
 import asyncio
 from datetime import datetime
@@ -123,7 +122,7 @@ def main(page: ft.Page):
     loggerv1.logm("Logger loaded.")
 
     # 1. Callback when user earns reward
-    def handle_reward(e: RewardEvent):
+    def handle_reward(e: fta.RewardEvent):
         print(f"User earned {e.amount} {e.type}!")
         score_text.value = f"Score: {int(score_text.data + e.amount)}"
         score_text.data += e.amount
@@ -135,7 +134,7 @@ def main(page: ft.Page):
 
         # Load a new ad
         rewarded_ad.page.add(
-            RewardedAd(
+            fta.RewardedAd(
                 unit_id="ca-app-pub-3940256099942544/5224354917",
                 on_load=handle_rewardedad_load,
                 on_user_earned_reward=handle_reward,
@@ -151,7 +150,7 @@ def main(page: ft.Page):
 
     try:
         # 3. Define the RewardedAd Control
-        rewarded_ad = RewardedAd(
+        rewarded_ad = fta.RewardedAd(
             unit_id="ca-app-pub-3940256099942544/5224354917",  # Android Test ID
             on_load=handle_rewardedad_load,
             on_user_earned_reward=handle_reward,
@@ -159,7 +158,7 @@ def main(page: ft.Page):
         )
         # loggerv1.logm("TYPE OF rewarded_ad", type(rewarded_ad))
 
-        iad = InterstitialAd(
+        iad = fta.InterstitialAd(
             unit_id="ca-app-pub-3940256099942544/1033173712",  # Android Test ID
             on_click=lambda e: loggerv1.logm(
                 "InterstitialAd clicked event received from dart."
@@ -179,17 +178,15 @@ def main(page: ft.Page):
             on_impression=lambda e: loggerv1.logm(
                 "InterstitialAd impression event received from dart."
             ),
-            on_log=lambda e: loggerv1.logm(
-                f"InterstitialAd log received from dart: {e.data}"
-            ),
         )
         # loggerv1.logm("TYPE OF IAD", type(iad))
     except Exception as ex:
         loggerv1.logm("Logger Error:", ex)
 
     # Add to page (invisible)
-    def append_overlay(control):
-        page.overlay.append(control)
+    def append_overlay(e, control):
+        e.page.overlay.append(control)
+        # page.overlay.append(control)
         loggerv1.logm(f"rewarded ad initilized.")
         page.update()
 
@@ -197,21 +194,25 @@ def main(page: ft.Page):
         page.overlay.clear()
         page.update()
 
+    def show_interstitial_ad():
+        iad.show()
+        loggerv1.logm(iad.read_current_log_file())
+
     Header_txt = ft.Text("Flet Ads Extension.", size=30, data=0)
     score_text = ft.Text("Score: 0", size=30, data=0)
     load_rewardedad_btn = ft.Button(
         "Load RewardAd",
-        on_click=lambda _: append_overlay(rewarded_ad),
+        on_click=lambda e: append_overlay(e, rewarded_ad),
     )
     show_rewardedad_btn = ft.Button(
         "Show Reward...", on_click=lambda _: rewarded_ad.show()
     )
     load_interstitial_btn = ft.Button(
         "Load Interstitial Ad",
-        on_click=lambda _: append_overlay(iad),
+        on_click=lambda e: append_overlay(e, iad),
     )
     show_interstitial_btn = ft.Button(
-        "Show Interstitial...", on_click=lambda _: iad.show()
+        "Show Interstitial...", on_click=show_interstitial_ad
     )
     clear_overlay_btn = ft.Button(
         "Clear Overlay...", on_click=lambda _: clear_overlay()
@@ -222,28 +223,6 @@ def main(page: ft.Page):
         height=90,
         bgcolor=ft.Colors.BLACK,
     )
-
-    def get_new_custom_banner_ad():
-        loggerv1.logm("get_new_banner_ad method triggered.")
-        try:
-            bads = (
-                fta.BannerAd(
-                    unit_id="ca-app-pub-3940256099942544/9214589741",
-                    on_click=lambda e: loggerv1.logm("BannerAd clicked"),
-                    on_load=lambda e: loggerv1.logm("BannerAd loaded"),
-                    on_error=lambda e: loggerv1.logm(f"BannerAd error: {e.data}"),
-                    on_open=lambda e: loggerv1.logm("BannerAd opened"),
-                    on_close=lambda e: loggerv1.logm("BannerAd closed"),
-                    on_impression=lambda e: loggerv1.logm("BannerAd impression"),
-                    on_will_dismiss=lambda e: loggerv1.logm("BannerAd will dismiss"),
-                ),
-            )
-            banner_ad_container.content = bads
-        except Exception as ex:
-            loggerv1.logm(f"get_new_custom_banner_ad method Error {ex}.")
-
-        banner_ad_container.bgcolor = ft.Colors.TRANSPARENT
-        page.update()
 
     def get_new_banner_ad() -> ft.Container:
         return ft.Container(
@@ -262,41 +241,38 @@ def main(page: ft.Page):
             ),
         )
 
-    show_bannerad_btn = ft.Button(
-        "Show Banner Ad",
-        on_click=get_new_custom_banner_ad,
-    )
-
     page.add(
-        # ft.Container(
-        #     alignment=ft.Alignment.TOP_RIGHT,
-        #     border=ft.Border.all(1, ft.Colors.RED_100),
-        #     padding=5,
-        #     expand=True,
-        #     content=ft.Column(
-        #         expand=True,
-        #         controls=[
-        #             ft.Column(
-        #                 alignment=ft.MainAxisAlignment.END,
-        #                 horizontal_alignment=ft.CrossAxisAlignment.END,
-        #                 expand=True,
-        #                 scroll=ft.ScrollMode.ALWAYS,
-        #                 controls=[
-        #                     # score_text,
-        #                     # load_rewardedad_btn,
-        #                     # show_rewardedad_btn,
-        #                     # load_interstitial_btn,
-        #                     # show_interstitial_btn,
-        #                     log_container,
-        #                     show_bannerad_btn,
-        #                 ],
-        #             )
-        #         ],
-        #     ),
-        # ),
-        ft.OutlinedButton(
-            content="Show BannerAd",
-            on_click=lambda e: page.add(get_new_banner_ad()),
+        ft.Container(
+            alignment=ft.Alignment.TOP_RIGHT,
+            border=ft.Border.all(1, ft.Colors.RED_100),
+            padding=5,
+            height=600,
+            content=ft.Container(
+                expand=True,
+                content=ft.Column(
+                    expand=True,
+                    controls=[
+                        ft.Column(
+                            alignment=ft.MainAxisAlignment.END,
+                            horizontal_alignment=ft.CrossAxisAlignment.END,
+                            expand=True,
+                            scroll=ft.ScrollMode.ALWAYS,
+                            controls=[
+                                score_text,
+                                load_rewardedad_btn,
+                                show_rewardedad_btn,
+                                load_interstitial_btn,
+                                show_interstitial_btn,
+                                log_container,
+                                ft.OutlinedButton(
+                                    content="Show BannerAd",
+                                    on_click=lambda e: page.add(get_new_banner_ad()),
+                                ),
+                            ],
+                        )
+                    ],
+                ),
+            ),
         ),
     )
 

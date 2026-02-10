@@ -4,6 +4,7 @@ src/flet_ads_ext/__init__.py
 src/flet_ads_ext/banner.py
 src/flet_ads_ext/base.py
 src/flet_ads_ext/interstitial.py
+src/flet_ads_ext/interstitial2.py
 src/flet_ads_ext/native.py
 src/flet_ads_ext/rewarded.py
 src/flet_ads_ext/types.py
