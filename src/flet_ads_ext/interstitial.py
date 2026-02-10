@@ -40,7 +40,7 @@ def setup_interstitial_logger():
 
     # Create formatter
     formatter = logging.Formatter(
-        "%(asctime)s - %(name)s - %(levelname)s - DEEPAK - %(message)s",
+        "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
         datefmt="%Y-%m-%d %H:%M:%S",
     )
     file_handler.setFormatter(formatter)
@@ -151,16 +151,16 @@ class InterstitialAd(ft.Service):
             "on_log",
         ]
 
-        # Log what parameters we received
-        if kwargs:
-            self.logger.debug(f"Received kwargs: {list(kwargs.keys())}")
+        # # Log what parameters we received
+        # if kwargs:
+        #     self.logger.debug(f"Received kwargs: {list(kwargs.keys())}")
 
         # Extract and store all InterstitialAd-specific parameters
         for param in interstitial_params:
             if param in kwargs:
                 value = kwargs.pop(param)
                 setattr(self, param, value)
-                self.logger.debug(f"Set {param} = {value}")
+                # self.logger.debug(f"Set {param} = {value}")
             else:
                 # Set default values for missing parameters
                 if param == "request":
@@ -175,6 +175,7 @@ class InterstitialAd(ft.Service):
         try:
             # Call parent constructor with remaining kwargs
             super().__init__(*args, **kwargs)
+            # Post_INIT__ gets triggered
             self.logger.info(f"InterstitialAd instance created successfully")
 
             # Log the instance details
