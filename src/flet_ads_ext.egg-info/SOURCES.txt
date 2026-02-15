@@ -8,6 +8,8 @@ src/flet_ads_ext/interstitial2.py
 src/flet_ads_ext/native.py
 src/flet_ads_ext/rewarded.py
 src/flet_ads_ext/types.py
+src/flet_ads_ext/ump.py
+src/flet_ads_ext/umpv2.py
 src/flet_ads_ext.egg-info/PKG-INFO
 src/flet_ads_ext.egg-info/SOURCES.txt
 src/flet_ads_ext.egg-info/dependency_links.txt
@@ -19,6 +21,9 @@ src/flutter/flet_ads_ext/lib/src/banner.dart
 src/flutter/flet_ads_ext/lib/src/extension.dart
 src/flutter/flet_ads_ext/lib/src/interstitial.dart
 src/flutter/flet_ads_ext/lib/src/rewarded.dart
+src/flutter/flet_ads_ext/lib/src/ump.dart
+src/flutter/flet_ads_ext/lib/src/umpv2.dart
 src/flutter/flet_ads_ext/lib/utils/ads.dart
+src/flutter/flet_ads_ext/lib/utils/consent_manager.dart
 src/flutter/flet_ads_ext/lib/utils/logger.dart
 src/flutter/flet_ads_ext/lib/utils/native.dart

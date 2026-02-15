@@ -1,5 +1,6 @@
 import flet as ft
 import flet_ads_ext as fta
+import flet_ads as fta2
 
 from pathlib import Path
 import asyncio
@@ -148,18 +149,19 @@ def main(page: ft.Page):
         loggerv1.logm("RewardedAd loaded event received from dart.")
         page.update()
 
-    try:
-        # 3. Define the RewardedAd Control
-        rewarded_ad = fta.RewardedAd(
-            unit_id="ca-app-pub-3940256099942544/5224354917",  # Android Test ID
-            on_load=handle_rewardedad_load,
-            on_user_earned_reward=handle_reward,
-            on_error=lambda e: print(f"Ad Error: {e.data}"),
-        )
-        # loggerv1.logm("TYPE OF rewarded_ad", type(rewarded_ad))
+    # 3. Define the RewardedAd Control
+    rewarded_ad = fta.RewardedAd(
+        unit_id="ca-app-pub-3940256099942544/5224354917",  # Android Test ID
+        on_load=handle_rewardedad_load,
+        on_user_earned_reward=handle_reward,
+        on_error=lambda e: print(f"Ad Error: {e.data}"),
+    )
+    loggerv1.logm("TYPE OF rewarded_ad", type(rewarded_ad))
 
-        iad = fta.InterstitialAd(
-            unit_id="ca-app-pub-3940256099942544/1033173712",  # Android Test ID
+    try:
+
+        iad = fta2.InterstitialAd(
+            unit_id="ca-app-pub-3940256099942544/1033173712",
             on_click=lambda e: loggerv1.logm(
                 "InterstitialAd clicked event received from dart."
             ),
@@ -179,24 +181,85 @@ def main(page: ft.Page):
                 "InterstitialAd impression event received from dart."
             ),
         )
-        # loggerv1.logm("TYPE OF IAD", type(iad))
+
+        # Log creation success
+        loggerv1.logm(f"InterstitialAd created successfully")
+        loggerv1.logm(f"Instance ID: {getattr(iad, '_i', 'Unknown')}")
+        loggerv1.logm(f"Instance class: {getattr(iad, '_c', 'Unknown')}")
+
+        # Try to read logs immediately
+        try:
+            # logs = iad.read_current_log_file(max_lines=20)
+            loggerv1.logm(f"Initial logs:\n{logs}")
+        except Exception as e:
+            loggerv1.logm(f"Could not read logs: {e}")
+
     except Exception as ex:
-        loggerv1.logm("Logger Error:", ex)
+        loggerv1.logm(f"Error creating InterstitialAd: {ex}")
+        import traceback
+
+        traceback_str = traceback.format_exc()
+        loggerv1.logm(f"Traceback: {traceback_str}")
+        # Also print to console
+        loggerv1.logm(f"ERROR creating InterstitialAd: {ex}")
+        traceback.print_exc()
 
     # Add to page (invisible)
     def append_overlay(e, control):
-        e.page.overlay.append(control)
-        # page.overlay.append(control)
-        loggerv1.logm(f"rewarded ad initilized.")
-        page.update()
+        try:
+            loggerv1.logm(f"Attempting to add {type(control).__name__} to overlay")
+            loggerv1.logm(f"Control type: {getattr(control, '_type', 'Unknown')}")
+            loggerv1.logm(f"Control ID: {getattr(control, '_i', 'Unknown')}")
+
+            # Check if it's a valid Flet control
+            if not isinstance(control, ft.Control):
+                loggerv1.logm(f"ERROR: Not a ft.Control instance")
+                return
+
+            e.page.overlay.append(control)
+            loggerv1.logm(f"Successfully added to overlay")
+
+            # Verify it was added
+            loggerv1.logm(f"Overlay now has {len(e.page.overlay)} controls")
+
+            page.update()
+
+        except Exception as ex:
+            loggerv1.logm(f"ERROR adding to overlay: {ex}")
+            import traceback
+
+            traceback_str = traceback.format_exc()
+            loggerv1.logm(f"Traceback: {traceback_str}")
+            # Also print to console
+            loggerv1.logm(f"ERROR adding to overlay: {ex}")
+            traceback.print_exc()
 
     def clear_overlay():
         page.overlay.clear()
         page.update()
 
     def show_interstitial_ad():
+        # checklist
+        loggerv1.logm(
+            f"Is it a Control? {isinstance(fta.InterstitialAd, type) and issubclass(fta.InterstitialAd, ft.Control)}"
+        )
+        # Add this right after creating the instance
+        loggerv1.logm(f"iad._type: {getattr(iad, '_type', 'NOT SET')}")
+        loggerv1.logm(f"iad.__class__.__name__: {iad.__class__.__name__}")
+        loggerv1.logm(f"iad.__class__.__module__: {iad.__class__.__module__}")
+        # Add this debug code in your main() function before creating the instance:
+        loggerv1.logm(f"ft.Service type: {type(ft.Service)}")
+        loggerv1.logm(f"Is ft.Service a class? {isinstance(ft.Service, type)}")
+        loggerv1.logm(
+            f"Is ft.Service a subclass of ft.Control? {issubclass(ft.Service, ft.Control)}"
+        )
+        # Also check what fta.InterstitialAd really is:
+        loggerv1.logm(f"fta.InterstitialAd: {fta.InterstitialAd}")
+        loggerv1.logm(f"fta.InterstitialAd.__bases__: {fta.InterstitialAd.__bases__}")
+        loggerv1.logm(f"fta.InterstitialAd.__mro__: {fta.InterstitialAd.__mro__}")
+
         iad.show()
-        loggerv1.logm(iad.read_current_log_file())
+        # loggerv1.logm(iad.read_current_log_file())
 
     Header_txt = ft.Text("Flet Ads Extension.", size=30, data=0)
     score_text = ft.Text("Score: 0", size=30, data=0)
@@ -218,12 +281,6 @@ def main(page: ft.Page):
         "Clear Overlay...", on_click=lambda _: clear_overlay()
     )
 
-    banner_ad_container = ft.Container(
-        width=320,
-        height=90,
-        bgcolor=ft.Colors.BLACK,
-    )
-
     def get_new_banner_ad() -> ft.Container:
         return ft.Container(
             width=320,
@@ -241,40 +298,132 @@ def main(page: ft.Page):
             ),
         )
 
-    page.add(
-        ft.Container(
-            alignment=ft.Alignment.TOP_RIGHT,
-            border=ft.Border.all(1, ft.Colors.RED_100),
-            padding=5,
-            height=600,
-            content=ft.Container(
-                expand=True,
-                content=ft.Column(
-                    expand=True,
-                    controls=[
-                        ft.Column(
-                            alignment=ft.MainAxisAlignment.END,
-                            horizontal_alignment=ft.CrossAxisAlignment.END,
-                            expand=True,
-                            scroll=ft.ScrollMode.ALWAYS,
-                            controls=[
-                                score_text,
-                                load_rewardedad_btn,
-                                show_rewardedad_btn,
-                                load_interstitial_btn,
-                                show_interstitial_btn,
-                                log_container,
-                                ft.OutlinedButton(
-                                    content="Show BannerAd",
-                                    on_click=lambda e: page.add(get_new_banner_ad()),
-                                ),
-                            ],
-                        )
-                    ],
-                ),
-            ),
-        ),
-    )
+    # loggerv1.logm(f"Creating ump instance.")
+    # print(f"Creating ump instance.")
+    # Production: Leave params empty or use minimal config
+    # Only use test_device_ids during development!
+    try:
+        state = {"privacy_required": False}
+
+        def check_consent_on_startup():
+            print("Initializing Startup UMP check...")
+
+            # Create a TEMPORARY instance just for startup
+            startup_ump = fta.UserMessagingPlatform(
+                debug_geography=fta.DebugGeography.DISABLED,
+                on_consent_status_changed=on_startup_consent,
+                on_privacy_options_required=on_startup_privacy_check,
+                on_error=lambda e: print(f"Startup Error: {e.data}"),
+            )
+
+            # Add to overlay temporarily to receive events
+            page.overlay.append(startup_ump)
+            page.update()
+
+        def on_startup_privacy_check(e):
+            data = json.loads(e.data)
+            state["privacy_required"] = data.get("is_privacy_options_required", False)
+            print(f"Privacy Required: {state['privacy_required']}")
+
+        def on_startup_consent(e):
+            data = json.loads(e.data)
+            can_request_ads = data.get("can_request_ads", False)
+            print(f"can_request_ads: {can_request_ads}")
+
+            # CRITICAL: We are done with startup. REMOVE the UMP control.
+            # This keeps your overlay clean.
+            page.overlay.clear()
+
+            # Route to Home
+            load_home_page(can_request_ads)
+
+        def open_privacy_settings(e):
+            print("User clicked Privacy Settings. Creating new UMP instance...")
+
+            # Create a NEW temporary instance just for this action
+            settings_ump = fta.UserMessagingPlatform(
+                # We don't need start-up checks here, just the method channel
+                on_error=lambda e: print(f"Settings Error: {e.data}")
+            )
+
+            # Add to overlay so it attaches to Flutter
+            page.overlay.append(settings_ump)
+            page.update()
+
+            # Call the method
+            settings_ump.show_privacy_options_form()
+
+            # Optional: You could remove this instance after a timeout,
+            # or listen for a 'form_closed' event to clean it up.
+            # For now, keeping one 'settings' instance in overlay is low cost.
+
+        def load_home_page(ads_enabled):
+            page.clean()  # Clears the Splash Screen
+
+            status_msg = "Ads Enabled" if ads_enabled else "Ads Disabled"
+            status_color = ft.Colors.GREEN if ads_enabled else ft.Colors.RED
+
+            page.add(
+                ft.Column(
+                    [
+                        ft.Text("Home Page", size=30),
+                        ft.Text(status_msg, color=status_color, size=20),
+                        ft.Container(height=20),
+                        # The Button Logic
+                        ft.ElevatedButton(
+                            "Privacy Settings",
+                            icon=ft.Icons.SECURITY,
+                            # Use the PYTHON STATE we saved earlier
+                            visible=state["privacy_required"],
+                            on_click=open_privacy_settings,
+                        ),
+                    ]
+                )
+            )
+
+    except Exception as ex:
+        loggerv1.logm(f"Creating ump instance failed. {ex}")
+        print(f"Creating ump instance failed. {ex}")
+
+    # Start the App with the Splash Loader
+    page.add(ft.Text("Loading App...", size=20))
+    page.update()
+    check_consent_on_startup()
+
+    # page.add(
+    #     ft.Container(
+    #         alignment=ft.Alignment.TOP_RIGHT,
+    #         border=ft.Border.all(1, ft.Colors.RED_100),
+    #         padding=5,
+    #         height=600,
+    #         content=ft.Container(
+    #             expand=True,
+    #             content=ft.Column(
+    #                 expand=True,
+    #                 controls=[
+    #                     ft.Column(
+    #                         alignment=ft.MainAxisAlignment.END,
+    #                         horizontal_alignment=ft.CrossAxisAlignment.END,
+    #                         expand=True,
+    #                         scroll=ft.ScrollMode.ALWAYS,
+    #                         controls=[
+    #                             score_text,
+    #                             load_rewardedad_btn,
+    #                             show_rewardedad_btn,
+    #                             load_interstitial_btn,
+    #                             show_interstitial_btn,
+    #                             log_container,
+    #                             ft.OutlinedButton(
+    #                                 content="Show BannerAd",
+    #                                 on_click=lambda e: page.add(get_new_banner_ad()),
+    #                             ),
+    #                         ],
+    #                     )
+    #                 ],
+    #             ),
+    #         ),
+    #     ),
+    # )
 
 
 ft.run(main)

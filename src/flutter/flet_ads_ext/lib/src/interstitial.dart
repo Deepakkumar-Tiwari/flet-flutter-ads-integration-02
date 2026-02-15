@@ -6,12 +6,16 @@ import '../utils/ads.dart';
 import '../utils/logger.dart';
 
 class InterstitialAdService extends FletService {
+
+  // FletService Constructor Implementation: FletService({required this.control});
   InterstitialAdService({required super.control});
 
   static InterstitialAd? _interstitialAd;
 
+  // @override
+  // void init() {
   @override
-  void init() {
+  Widget build(BuildContext context) {
     super.init();
     debugPrint("InterstitialAd(${control.id}).init: ${control.properties}");
     control.addInvokeMethodListener(_invokeMethod);
@@ -60,6 +64,8 @@ class InterstitialAdService extends FletService {
         },
       )
     );
+    return ConstrainedControl(
+        control: control, child: SizedBox.shrink()); 
   }
 
   Future<dynamic> _invokeMethod(String name, dynamic args) async {

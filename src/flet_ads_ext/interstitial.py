@@ -59,6 +59,7 @@ _interstitial_logger, _log_file_path = setup_interstitial_logger()
 
 @ft.control("InterstitialAd")
 class InterstitialAd(ft.Service):
+    # class InterstitialAd(ft.Control):
     """
     Displays a full-screen interstitial ad.
 

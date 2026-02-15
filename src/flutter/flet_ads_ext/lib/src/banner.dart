@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flet/flet.dart';
 import 'package:flutter/widgets.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
@@ -12,7 +13,8 @@ import '../utils/logger.dart';
 //     widget.control.triggerEvent: This is how the Flutter side tells the Python/Flet side that something happened (e.g., on_click).
 class BannerAdControl extends StatefulWidget {
   final Control control;
-
+  
+  // StatefulWidget constructor implementation: const StatefulWidget({super.key});
   const BannerAdControl({super.key, required this.control});
 
   @override
@@ -21,6 +23,16 @@ class BannerAdControl extends StatefulWidget {
 
 class _BannerAdControlState extends State<BannerAdControl> with FletStoreMixin {
   bool _isLoaded = false;
+  BannerAd? bannerAd;
+
+  // @override
+  // void didChangeDependencies() {
+  //   super.didChangeDependencies();
+  //   // Load ad once dependencies (like MediaQuery) are available and if not loaded
+  //   if (!_isLoaded && bannerAd == null) {
+  //     _loadAd();
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -29,6 +41,12 @@ class _BannerAdControlState extends State<BannerAdControl> with FletStoreMixin {
     final testAdUnitId = isIOSMobile()
         ? 'ca-app-pub-3940256099942544/4411468910'
         : 'ca-app-pub-3940256099942544/1033173712';
+
+    // // Get screen width for adaptive size
+    // final size = await AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(
+    //   MediaQuery.sizeOf(context).width.truncate(),
+    // );
+
     BannerAd bannerAd = BannerAd(
       adUnitId: widget.control.getString("unit_id", testAdUnitId)!,
       request:
@@ -89,6 +107,12 @@ class _BannerAdControlState extends State<BannerAdControl> with FletStoreMixin {
     );
 
     if (!_isLoaded) {
+      // // Safety check: ensure we can request ads
+      // // Note: This relies on umpControl having run successfully globally
+      // if (!(await ConsentInformation.instance.canRequestAds())) {
+      //   widget.control.triggerEvent("error", "Cannot request ads (Consent missing)");
+      //   return;
+      // }
       bannerAd.load();
     }
 
